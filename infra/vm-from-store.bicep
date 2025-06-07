@@ -1,4 +1,4 @@
-// Bicep template for deploying a Windows 11 21H2 VM
+// Bicep template for deploying a Windows 11 24H2 VM
 // Moved from project root for best practices
 // Add resource tags and comments for traceability
 // Parameters should be set via parameter files or pipeline
@@ -10,10 +10,11 @@ param adminUsername string // <-- Enter your admin username
 param adminPassword string // <-- Enter your admin password (use a secure parameter in pipeline)
 param vnetName string
 param subnetName string
+param owner string // <-- Enter your name or alias for the owner tag
 param tags object = {
   environment: 'dev'
   project: 'AzVmImageSnapshots'
-  owner: '<your-name-or-alias>'
+  owner: owner
 }
 
 resource nic 'Microsoft.Network/networkInterfaces@2021-05-01' = {
@@ -49,7 +50,7 @@ resource vm 'Microsoft.Compute/virtualMachines@2021-07-01' = {
       imageReference: {
         publisher: 'MicrosoftWindowsDesktop'
         offer: 'windows-11'
-        sku: 'win11-21h2-pro'
+        sku: 'win11-24h2-pro'
         version: 'latest'
       }
       osDisk: {

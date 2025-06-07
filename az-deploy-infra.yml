@@ -1,0 +1,82 @@
+# Azure Pipeline for Deploying Bicep Infrastructure
+# This pipeline deploys the resource group, compute gallery, and VM resources using tested Bicep files.
+
+trigger:
+- main
+
+pool:
+  vmImage: 'windows-latest'
+
+variables:
+  azureSubscription: 'Your-Service-Connection-Name' # Update with your Azure service connection name
+  location: 'canadacentral'
+  resourceGroupName: 'rg-azvmsnapshots'
+  galleryName: 'azvmgallery'
+  imageDefinitionName: 'devImages'
+  vmName: 'vm-firstgen'
+  adminUsername: '$(adminUsername)'
+  adminPassword: '$(adminPassword)'
+  owner: '<Your Name or Email>'
+  vnetName: 'vmVnet'
+  subnetName: 'vmSubnet'
+
+stages:
+- stage: DeployInfra
+  displayName: 'Deploy Infrastructure'
+  jobs:
+  - job: DeployRG
+    displayName: 'Deploy Resource Group'
+    steps:
+    - task: AzureCLI@2
+      displayName: 'Deploy Resource Group Bicep'
+      inputs:
+        azureSubscription: $(azureSubscription)
+        scriptType: 'ps'
+        scriptLocation: 'inlineScript'
+        inlineScript: |
+          az deployment sub create \
+            --location $(location) \
+            --template-file infra/create-rg.bicep \
+            --parameters resourceGroupName=$(resourceGroupName)
+
+  - job: DeployGallery
+    displayName: 'Deploy Compute Gallery, VNet, NSG'
+    dependsOn: DeployRG
+    steps:
+    - task: AzureCLI@2
+      displayName: 'Deploy Compute Gallery Bicep'
+      inputs:
+        azureSubscription: $(azureSubscription)
+        scriptType: 'ps'
+        scriptLocation: 'inlineScript'
+        inlineScript: |
+          az deployment group create \
+            --resource-group $(resourceGroupName) \
+            --template-file infra/compute-gallery.bicep \
+            --parameters galleryName=$(galleryName)
+
+  - job: DeployVM
+    displayName: 'Deploy VM from Marketplace Image'
+    dependsOn: DeployGallery
+    steps:
+    - task: AzureCLI@2
+      displayName: 'Deploy VM Bicep'
+      inputs:
+        azureSubscription: $(azureSubscription)
+        scriptType: 'ps'
+        scriptLocation: 'inlineScript'
+        inlineScript: |
+          az deployment group create \
+            --resource-group $(resourceGroupName) \
+            --template-file infra/vm-from-store.bicep \
+            --parameters \
+              vmName=$(vmName) \
+              adminUsername=$(adminUsername) \
+              adminPassword=$(adminPassword) \
+              vnetName=$(vnetName) \
+              subnetName=$(subnetName) \
+              owner=$(owner)
+
+# Secrets (adminUsername, adminPassword) should be set as pipeline variables or Azure Key Vault references.
+# Update 'azureSubscription' with your Azure service connection name.
+# Adjust parameters as needed for your environment.

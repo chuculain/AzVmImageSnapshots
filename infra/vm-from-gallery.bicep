@@ -5,8 +5,6 @@ param adminUsername string
 param adminPassword string
 param imageGalleryName string
 param imageDefinitionName string
-param imageVersion string = 'latest'
-param instanceCount int = 1
 param vmSize string = 'Standard_DS1_v2'
 param networkInterfaceName string = 'nic'
 param publicIpAddressName string = 'ip'
@@ -38,8 +36,7 @@ resource vm 'Microsoft.Compute/virtualMachines@2021-03-01' = {
     }
     storageProfile: {
       imageReference: {
-        id: galleryImage.id
-        version: imageVersion
+        id: '${galleryImage.id}/versions/latest'
       }
       osDisk: {
         name: osDiskName
