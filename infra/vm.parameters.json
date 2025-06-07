@@ -1,0 +1,13 @@
+// Parameters for vm.bicep deployment
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "vmName": { "value": "<your-vm-name>" },
+    "adminUsername": { "value": "<your-admin-username>" },
+    "adminPassword": { "value": "<your-admin-password>" },
+    "vnetName": { "value": "vmVnet" },
+    "subnetName": { "value": "vmSubnet" },
+    "location": { "value": "canadacentral" }
+  }
+}
