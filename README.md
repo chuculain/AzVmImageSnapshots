@@ -57,9 +57,17 @@ No need to allow for remote desktop access.
 - Use pipeline stages for infra, image, and VM deployment.
 - It is expected for any pipeline that creates a VM resource, a cleanup stage will be run after approval by the user. 
 
-## 6. Azure ressources
+## 6. Azure resources
 - Deploy to centralcanada location
 - Use the cheapest VM SKU for the region.
 - Encode resource deletion into pipeline cleanup stage activated after user approval.
 
+## 7. Naming Conventions
+- Use clear and descriptive names for resources.
+- Use a consistent naming pattern, using env subscription, location and resource type. e.g., 
+`dcacevm1`, 
+`dcacedisk`, 
+`dcacecg`.
+- inspire yourself from the Azure naming conventions for resources.
+- inspire yourself from Sumerian mythology for names of resources.
 ---

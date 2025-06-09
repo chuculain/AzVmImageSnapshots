@@ -8,18 +8,16 @@ pool:
   vmImage: 'windows-latest'
 
 variables:
-  azureSubscription: 'Your-Service-Connection-Name' # Update with your Azure service connection name
+  azureSubscription: 'development' 
   location: 'canadacentral'
-  resourceGroupName: 'rg-azvmsnapshots'
-  galleryName: 'azvmgallery'
-  imageDefinitionName: 'devImages'
-  vmName: 'vm-firstgen'
-  adminUsername: '$(adminUsername)'
-  adminPassword: '$(adminPassword)'
-  owner: '<Your Name or Email>'
-  vnetName: 'vmVnet'
-  subnetName: 'vmSubnet'
-
+  resourceGroupName: 'dcacerg'
+  galleryName: 'dcacecg'
+  imageDefinitionName: 'dwinlatest'
+  vmName: 'dcacevm1'
+  vnetName: 'dcacevnet'
+  subnetName: 'dcacesubnet'
+  keyVaultName: 'dcacekv' 
+  
 stages:
 - stage: DeployInfra
   displayName: 'Deploy Infrastructure'
@@ -53,11 +51,26 @@ stages:
           az deployment group create \
             --resource-group $(resourceGroupName) \
             --template-file infra/compute-gallery.bicep \
-            --parameters galleryName=$(galleryName)
+            --parameters galleryName=$(galleryName) keyVaultName=$(keyVaultName)
+
+  - job: SetAdminPassword
+    displayName: 'Generate and Store Admin Password in Key Vault'
+    dependsOn: DeployGallery
+    steps:
+    - task: AzureCLI@2
+      displayName: 'Generating key vault secret'
+      inputs:
+        azureSubscription: $(azureSubscription)
+        scriptType: 'ps'
+        scriptLocation: 'inlineScript'
+        inlineScript: |
+          $secretId = [System.Web.Security.Membership]::GeneratePassword(20,3)
+          az keyvault secret set --vault-name $(keyVaultName) --name "secretId" --value $secretId
+          echo "##vso[task.setvariable variable=secretId;issecret=true]$secretId"
 
   - job: DeployVM
     displayName: 'Deploy VM from Marketplace Image'
-    dependsOn: DeployGallery
+    dependsOn: SetAdminPassword
     steps:
     - task: AzureCLI@2
       displayName: 'Deploy VM Bicep'
@@ -69,13 +82,8 @@ stages:
           az deployment group create \
             --resource-group $(resourceGroupName) \
             --template-file infra/vm-from-store.bicep \
-            --parameters \
-              vmName=$(vmName) \
-              adminUsername=$(adminUsername) \
-              adminPassword=$(adminPassword) \
-              vnetName=$(vnetName) \
-              subnetName=$(subnetName) \
-              owner=$(owner)
+            --parameters @infra/vm.parameters.json \
+            --parameters adminPasswordSecretName=secretId keyVaultName=$(keyVaultName)
 
 # Secrets (adminUsername, adminPassword) should be set as pipeline variables or Azure Key Vault references.
 # Update 'azureSubscription' with your Azure service connection name.

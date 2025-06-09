@@ -1,8 +1,10 @@
 param location string = 'canadacentral' 
 param vmNamePrefix string = 'vm'
 param adminUsername string
-@secure()
-param adminPassword string
+param keyVaultName string
+param adminPasswordSecretName string
+// Retrieve the admin password from Key Vault
+var adminPasswordFromKeyVault = reference(resourceId('Microsoft.KeyVault/vaults/secrets', keyVaultName, adminPasswordSecretName), '2015-06-01').secretValue
 param imageGalleryName string
 param imageDefinitionName string
 param vmSize string = 'Standard_DS1_v2'
@@ -16,6 +18,15 @@ param tags object = {
   project: 'AzVmImageSnapshots'
   owner: 'chuculain'
 }
+
+// This Bicep file deploys a VM from an Azure Compute Gallery image with an ephemeral OS disk.
+// It is designed for use in pipeline 3 as described in the project README.md.
+//
+// Parameters should be provided via parameter files or pipeline variables for security and flexibility.
+//
+// Resource names should follow Sumerian mythology naming conventions as per project standards.
+//
+// For production, inject secrets via Azure Key Vault or pipeline secrets.
 
 resource galleryImage 'Microsoft.Compute/galleries/images@2021-03-01' existing = {
   name: '${imageGalleryName}/${imageDefinitionName}'
@@ -32,7 +43,7 @@ resource vm 'Microsoft.Compute/virtualMachines@2021-03-01' = {
     osProfile: {
       computerName: '${vmNamePrefix}-${uniqueString(resourceGroup().id)}'
       adminUsername: adminUsername
-      adminPassword: adminPassword
+      adminPassword: adminPasswordFromKeyVault
     }
     storageProfile: {
       imageReference: {
@@ -46,6 +57,7 @@ resource vm 'Microsoft.Compute/virtualMachines@2021-03-01' = {
           option: 'Local'
           placement: 'CacheDisk'
         }
+        tags: tags
       }
     }
     networkProfile: {
@@ -109,3 +121,5 @@ resource virtualNetwork 'Microsoft.Network/virtualNetworks@2021-02-01' = {
 }
 
 output adminUsernameOutput string = adminUsername
+output vmNameOutput string = vm.name
+output publicIpAddressOutput string = publicIpAddress.name
