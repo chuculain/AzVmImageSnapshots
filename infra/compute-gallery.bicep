@@ -75,7 +75,18 @@ resource keyVault 'Microsoft.KeyVault/vaults@2022-07-01' = if (keyVaultName != '
       name: 'standard'
     }
     tenantId: subscription().tenantId
-    accessPolicies: [] // Add access policies as needed
+    accessPolicies: [
+      {
+        tenantId: subscription().tenantId
+        objectId: 'e6d8dffd-bd05-4496-afc2-ec80928776a2'
+        permissions: {
+          secrets: [
+            'get'
+            'set'
+          ]
+        }
+      }
+    ]
     enableSoftDelete: true
   }
   tags: tags
