@@ -32,9 +32,9 @@ stages:
         scriptType: 'pscore'
         scriptLocation: 'inlineScript'
         inlineScript: |
-          az deployment sub create \
-            --location $(location) \
-            --template-file infra/create-rg.bicep \
+          az deployment sub create `
+            --location $(location) `
+            --template-file infra/create-rg.bicep `
             --parameters resourceGroupName=$(resourceGroupName)
 
   - job: DeployGallery
@@ -48,9 +48,9 @@ stages:
         scriptType: 'pscore'
         scriptLocation: 'inlineScript'
         inlineScript: |
-          az deployment group create \
-            --resource-group $(resourceGroupName) \
-            --template-file infra/compute-gallery.bicep \
+          az deployment group create `
+            --resource-group $(resourceGroupName) `
+            --template-file infra/compute-gallery.bicep `
             --parameters galleryName=$(galleryName) keyVaultName=$(keyVaultName)
 
   - job: SetAdminPassword
@@ -79,10 +79,10 @@ stages:
         scriptType: 'pscore'
         scriptLocation: 'inlineScript'
         inlineScript: |
-          az deployment group create \
-            --resource-group $(resourceGroupName) \
-            --template-file infra/vm-from-store.bicep \
-            --parameters @infra/vm.parameters.json \
+          az deployment group create `
+            --resource-group $(resourceGroupName) `
+            --template-file infra/vm-from-store.bicep `
+            --parameters @infra/vm.parameters.json `
             --parameters adminPasswordSecretName=secretId keyVaultName=$(keyVaultName)
 
 # Secrets (adminUsername, adminPassword) should be set as pipeline variables or Azure Key Vault references.
