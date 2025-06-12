@@ -1,10 +1,17 @@
-// Parameters for vm.bicep deployment
 {
   "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
   "contentVersion": "1.0.0.0",
   "parameters": {
     "vmName": { "value": "dcacedevvm01" },
     "adminUsername": { "value": "chuculain" },
+    "adminPassword": {
+      "reference": {
+        "keyVault": {
+          "id": "/subscriptions/c72e9e9b-f1c8-409f-9350-4f9d57cbbcef/resourceGroups/dcacerg/providers/Microsoft.KeyVault/vaults/dcacekv"
+        },
+        "secretName": "secretId"
+      }
+    },
     "vnetName": { "value": "dcacevnet" },
     "subnetName": { "value": "dcacesubnet" },
     "location": { "value": "canadacentral" },

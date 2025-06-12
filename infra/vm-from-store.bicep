@@ -7,7 +7,7 @@ param location string = 'canadacentral' // Laval, QC, Canada region
 param vmName string // <-- Enter your VM name
 param adminUsername string // <-- Enter your admin username
 param keyVaultName string
-param adminPasswordSecretName string
+param adminPassword string
 param vnetName string
 param subnetName string
 param owner string // <-- Enter your name or alias for the owner tag
@@ -17,7 +17,6 @@ param tags object = {
   owner: owner
 }
 
-var adminPasswordFromKeyVault = reference(resourceId('Microsoft.KeyVault/vaults/secrets', keyVaultName, adminPasswordSecretName), '2015-06-01').secretValue
 
 resource nic 'Microsoft.Network/networkInterfaces@2021-05-01' = {
   name: '${vmName}-nic'
@@ -46,7 +45,7 @@ resource vm 'Microsoft.Compute/virtualMachines@2021-07-01' = {
     osProfile: {
       computerName: vmName
       adminUsername: adminUsername
-      adminPassword: adminPasswordFromKeyVault
+      adminPassword: adminPassword
     }
     storageProfile: {
       imageReference: {
