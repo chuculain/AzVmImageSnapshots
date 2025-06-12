@@ -83,6 +83,8 @@ resource keyVault 'Microsoft.KeyVault/vaults@2022-07-01' = if (keyVaultName != '
           secrets: [
             'get'
             'set'
+            'list'
+            'read'
           ]
         }
       }
