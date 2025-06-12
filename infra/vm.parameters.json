@@ -4,9 +4,9 @@
   "contentVersion": "1.0.0.0",
   "parameters": {
     "vmName": { "value": "dcacedevvm01" },
-    "adminUsername": { "value": "<adminUsername>" }, // Replace <adminUsername> with the actual username during deployment
-    "vnetName": { "value": "dcacedev-vnet" },
-    "subnetName": { "value": "dcacedev-subnet" },
+    "adminUsername": { "value": "chuculain" },
+    "vnetName": { "value": "dcacevnet" },
+    "subnetName": { "value": "dcacesubnet" },
     "location": { "value": "canadacentral" },
     "owner": { "value": "chuculain" }
   }
