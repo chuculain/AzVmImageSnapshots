@@ -82,8 +82,7 @@ stages:
           az deployment group create `
             --resource-group $(resourceGroupName) `
             --template-file infra/vm-from-store.bicep `
-            --parameters @infra/vm.parameters.json `
-            --parameters adminPasswordSecretName=secretId keyVaultName=$(keyVaultName)
+            --parameters @infra/vm.parameters.json
 
 # Secrets (adminUsername, adminPassword) should be set as pipeline variables or Azure Key Vault references.
 # Update 'azureSubscription' with your Azure service connection name.
