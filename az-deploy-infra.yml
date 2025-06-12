@@ -64,7 +64,7 @@ stages:
         scriptType: 'pscore'
         scriptLocation: 'inlineScript'
         inlineScript: |
-          $secretId = [System.Web.Security.Membership]::GeneratePassword(20,3)
+          $secretId = -join ((48..57) + (65..90) + (97..122) | Get-Random -Count 20 | % {[char]$_})
           az keyvault secret set --vault-name $(keyVaultName) --name "secretId" --value $secretId
           echo "##vso[task.setvariable variable=secretId;issecret=true]$secretId"
 
