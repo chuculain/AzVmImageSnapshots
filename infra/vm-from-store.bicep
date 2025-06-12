@@ -7,6 +7,7 @@ param location string = 'canadacentral' // Laval, QC, Canada region
 param vmName string // <-- Enter your VM name
 param adminUsername string // <-- Enter your admin username
 param keyVaultName string
+@secure()
 param adminPassword string
 param vnetName string
 param subnetName string
